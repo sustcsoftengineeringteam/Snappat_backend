@@ -2,6 +2,7 @@ const fileCache = require('think-cache-file');
 const nunjucks = require('think-view-nunjucks');
 const fileSession = require('think-session-file');
 const mysql = require('think-model-mysql');
+
 const {
   Console,
   File,
@@ -9,6 +10,10 @@ const {
 } = require('think-logger3');
 const path = require('path');
 const isDev = think.env === 'development';
+
+const fundebug = require("fundebug-nodejs");
+fundebug.apikey = "717988b702d76a14d50221459e68e5c905e362e66dc2e26273ad9ae1932566ee";
+think.app.on("error", fundebug.KoaErrorHandler);
 
 /**
  * cache adapter config
@@ -46,7 +51,7 @@ exports.model = {
     host: '127.0.0.1',
     port: '3306',
     user: 'root',
-    password: '',
+    password: 'Art(*)%)%',
     dateStrings: true
   }
 };

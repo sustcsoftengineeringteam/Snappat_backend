@@ -8,5 +8,4 @@ const instance = new Application({
   watcher: watcher,
   env: 'development'
 });
-
 instance.run();
