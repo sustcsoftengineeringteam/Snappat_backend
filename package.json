@@ -25,11 +25,15 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "think-watcher": "^3.0.0",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "ava": "^0.18.0",
+    "chai": "^4.2.0",
     "eslint": "^4.2.0",
     "eslint-config-think": "^1.0.0",
-    "ava": "^0.18.0",
-    "nyc": "^7.0.0"
+    "mocha": "^6.1.4",
+    "nyc": "^7.1.0",
+    "think-watcher": "^3.0.3"
   },
   "repository": "",
   "license": "MIT",
@@ -48,5 +52,20 @@
     "template": "/usr/local/lib/node_modules/think-cli/default_template",
     "clone": false,
     "isMultiModule": false
+  },
+  "babel": {
+    "presets": ["@babel/preset-env"],
+    "env": {
+      "test": {
+        "plugins": ["istanbul"]
+      }
+    }
+  },
+  "nyc": {
+    "all": true,
+    "include": [
+      "src/controller/*.js"
+    ],
+    "exclude": []
   }
 }
