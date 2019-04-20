@@ -1,5 +1,38 @@
+# Snappet Backend Illustration
 
-Application created by [ThinkJS](http://www.thinkjs.org)
+> Application created by [ThinkJS](http://www.thinkjs.org)
+>
+> Auther: RT 
+>
+> E-mail: 623059008@qq.com
+
+## For Project Inspector
+
+> Also for front-end developers，
+>
+>  If this file has strange format, download it and open with better markdown software, please.
+
+— TestReport:``` ./coverage/index.html```
+
+— Api doc: ```./apidoc/index.html```
+
+— config: ```./src/config/*.js```
+
+— functional codes: ```./src/controller/*.js```
+
+### Pictures
+
+#### Api Doc
+
+![](https://i.loli.net/2019/04/20/5cbb3363bb6a4.png)
+
+#### Coverage
+
+> There is an error when use nyc to generate report, but don't worry, the codes can pass all test units by ava.
+
+![](https://i.loli.net/2019/04/20/5cbb33f7adb3d.png)
+
+![](https://i.loli.net/2019/04/20/5cbb33ad0302e.png)
 
 ## Install dependencies
 
@@ -22,7 +55,11 @@ pm2 startOrReload pm2.json
 ```
 
 
+
+
+
 # Database Instruction
+
 #users
 ![](https://i.loli.net/2019/03/11/5c85d69b6a046.png)
 ```
