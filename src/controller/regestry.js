@@ -17,24 +17,24 @@ module.exports = class extends think.Controller {
     }
   }
   /**
-   * [注册一个新用户]
+   * [Register for a new user]
    * @api {post} /regestry/registry Registry
    * @apiName Registry
    * @apiVersion 1.0.1
    * @apiGroup User
-   * @apiParam {String} username (非必须)用户名
-   * @apiParam {String} phone 电话号码
-   * @apiSuccess {Number} userid 自己的id
+   * @apiParam {String} username (Not mandatory)username
+   * @apiParam {String} phone phone number
+   * @apiSuccess {Number} userid user ID
    */
   async registryAction() {
     let postdata = this.post();
     let phone = postdata["phone"];
     let username = postdata["username"];
     // let ans = await SMS_verification(phone);
-    let ans = true; //测试期间开放验证
+    let ans = true; // open the verification during testing period
     if (ans) {
       let user = this.model("users");
-      //重复检测
+      // repeat the verification
       let repeat_user = await user.where({
         phone: phone
       }).select();

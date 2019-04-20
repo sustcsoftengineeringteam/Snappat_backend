@@ -63,14 +63,14 @@ module.exports = class Card extends Base {
     return;
   }
   /**
-   * [查询自己的信息]
+   * [Query one's own info]
    * @api {post} /user/select Select Your Own Info(Login)
    * @apiName Select Your Own Info(Login)
    * @apiVersion 1.0.1
    * @apiGroup User
-   * @apiParam {String} username 用户名
-   * @apiParam {String} phone 电话号码
-   * @apiSuccess {JSONString} userinfo 自己的全部信息
+   * @apiParam {String} username  username
+   * @apiParam {String} phone  phone number
+   * @apiSuccess {JSONString} userinfo  all the information of a user
    */
   async selectAction() {
     let postdata = this.post();
@@ -80,12 +80,12 @@ module.exports = class Card extends Base {
     return this.success(userinfo);
   }
   /**
-   * [获取自己的MysteryList]
+   * Get one's own MysteryList
    * @api {get} /user/selectMystery Select Your Own Mystery List
    * @apiName Select Your Own Mystery List
    * @apiVersion 1.0.1
    * @apiGroup User
-   * @apiSuccess {JSONString} MysteryList 自己的发布的所有MysteryList
+   * @apiSuccess {JSONString} MysteryList  All the mysteries one has published
    */
   async selectMysteryAction() {
     let postdata = this.post();
@@ -95,12 +95,12 @@ module.exports = class Card extends Base {
     return this.success(data);
   }
   /**
-   * [获取自己的HistoryList]
+   * [Get one's own HistoryList]
    * @api {get} /user/selectHistory Select Your Own History List
    * @apiName Select Your Own History List
    * @apiVersion 1.0.1
    * @apiGroup User
-   * @apiSuccess {JSONString} MysteryList 自己的发布的所有HistoryList
+   * @apiSuccess {JSONString} MysteryList  All the history mysteries
    */
   async selectHistoryAction() {
     let postdata = this.post();
@@ -111,12 +111,12 @@ module.exports = class Card extends Base {
 
   }
   /**
-   * [获取自己的MessageList]
+   * [Get one's own MessageList]
    * @api {get} /user/selectMessage Select Your Own Message List
    * @apiName Select Your Message List
    * @apiVersion 1.0.1
    * @apiGroup User
-   * @apiSuccess {String} MessageList 自己的发布的所有MessageList
+   * @apiSuccess {String} MessageList  All the messages one has sent
    */
   async selectMessageAction() {
     let postdata = this.post();
@@ -128,15 +128,15 @@ module.exports = class Card extends Base {
 
   }
   /**
-   * [获取某个用户的全部信息]
+   * [Get all the information of some user]
    * @api {post} /user/selectUser Select User Info by Id
    * @apiName Select User Info by Id
    * @apiVersion 1.0.1
    * @apiGroup User
-   * @apiParam {String} username 用户名
-   * @apiParam {String} phone 电话
-   * @apiParam {Number} select_id 指定id
-   * @apiSuccess {JSONString} userinfo 另外一个用户的全部信息
+   * @apiParam {String} username username
+   * @apiParam {String} phone phone number
+   * @apiParam {Number} select_id assigned id
+   * @apiSuccess {JSONString} userinfo user information
    */
   async selectUserAction() {
     let postdata = this.post();
@@ -164,8 +164,7 @@ module.exports = class Card extends Base {
    * @apiParam {Object} mystery.key
    * @apiParam {String} mystery.edata
    * @apiParam {Number} mystery.coins
-   * @apiSuccess {JSONString} success 成功返回success,失败返回fail
-   * [添加一条Mystery]
+   * @apiSuccess {JSONString} success If succeeds, return success. Otherwise return fail.
    */
   async addMysteryAction() {
     let postdata = this.post();
@@ -205,7 +204,7 @@ module.exports = class Card extends Base {
     }
   }
   /**
-   * [仅更新一条mystery的破解/点赞/评论/查看(decoder,favor,comment,view)]
+   * [Update information of only this mystery:  decoder/favor/comment/view]
    * @api {post} /user/updateMystery Update the decoder/favor/comment/view for a mystery
    * @apiName Update the decoder/favor/comment/view for a mystery
    * @apiVersion 1.0.1
@@ -216,7 +215,7 @@ module.exports = class Card extends Base {
    * @apiParam {ListString} mystery.comment
    * @apiParam {Number} mystery.view
    * @apiSuccess {JSONString} success
-   * [传过来的mystery务必要有旧的数据(decoder,favor,comment,view),即使你不更新这一项!]
+   * [Tne mystery passed in must contain old data (decoder,favor,comment,view), even if it is not updated!]
    */
   async updateMysteryAction() {
     let postdata = this.post();
@@ -253,14 +252,14 @@ module.exports = class Card extends Base {
     }
   }
   /**
-   * [提交破解记录并获得奖励]
+   * [Commit decode history and get rewards]
    * @api {post} /user/crackMystery Post Decode History
    * @apiName Post Decode History
    * @apiVersion 1.0.1
    * @apiGroup Mystery
    * @apiParam {JSONString} mystery
    * @apiParam {Number} mystery.userid
-   * @apiSuccess {JSONString} success 不严谨的判断,只有最后数据成功会返回success,登录失败返回fail,高并发数据库响应出错不负责
+   * @apiSuccess {JSONString} success Imprudent judgement, only return success when getting the feedback of data successfully. If fail to log in, it would return fail. Not responsible for the failure of high concurrent database response.
    */
   async crackMysteryAction() {
     let postdata = this.post();
@@ -272,11 +271,11 @@ module.exports = class Card extends Base {
 
     let user = this.model("users");
     let History = JSON.parse(Cracker["histroy"]);
-    //防止客户端穿过来错误信息或发生raceCondition状况
+    // prevent the wrong message sent from the client server or race condition.
     mystery = JSON.parse(user.where({
       id: mystery["userid"]
     }).select()[0]["mystery"]);
-    //为自己的history添加破解记录
+    // add decode history in one's history list
     let history = {
       "id": mystery["id"],
       "userid": mystery["userid"],
@@ -284,7 +283,7 @@ module.exports = class Card extends Base {
     };
     History.push(history);
     let HistoryString = JSON.stringify(History);
-    //为mystery添加decoder记录
+    // record decode message for this mystery
     let userinfo = user.where({
       id: mystery["userid"]
     }).select();
@@ -302,7 +301,7 @@ module.exports = class Card extends Base {
       mystery: MysteryListString
     });
 
-    //获得破解的bonus
+    // get the bonus for decoding the mystery
     mystery["coins"] = parseInt(mystery["coins"]);
     let coins = parseInt(Cracker["coins"]);
     if (mystery["coins"] > 0) {
