@@ -18,7 +18,7 @@ module.exports = class extends think.Controller {
   }
   /**
    * [Register for a new user]
-   * @api {post} /regestry/registry Registry
+   * @api {post} /registry/registry Registry
    * @apiName Registry
    * @apiVersion 1.0.1
    * @apiGroup User
