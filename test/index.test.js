@@ -5,6 +5,7 @@ require(path.join(process.cwd(), 'production.js'));
 
 test('user_registry_and_select', async function(t) {
   const user = think.model('users');
+
   let add_data = await user.add({
     "username": "测试用户",
     "phone": "00000000000",
@@ -22,6 +23,10 @@ test('user_registry_and_select', async function(t) {
     id: add_data
   }).select();
   assert.equal(userinfo[0]["id"], add_data);
+  // await user.delete({
+  //   "phone": "00000000000"
+  // });
+
 });
 
 test('user_select_mystery', async function(t) {

@@ -26,7 +26,7 @@ function encodeUnicode(str) {
   }
   return "\\u" + res.join("\\u");
 }
-module.exports = class Card extends Base {
+module.exports = class User extends Base {
   async __before() {
     var _this = this;
     const method = _this.method.toLowerCase();
@@ -38,29 +38,17 @@ module.exports = class Card extends Base {
       _this.end();
     }
     // login and add cookie to ctx;
-    let postdata = this.post();
-    let username = postdata["username"];
-    let phone = postdata["phone"];
-    let user = this.model("users");
-    if (!this.ctx.cookie("userinfo")) {
-      console.log("store cookie");
-      if (phone != undefined && username != undefined) {
-        const data = await user.where({
-          username: username,
-          phone: phone
-        }).select();
-        if (data.length == 1) {
-          let userinfo = JSON.stringify(data[0]);
-          this.ctx.cookie("userinfo", encodeUnicode(userinfo));
-          return;
-        } else {
-          return this.fail(1003, Errors["1003"]);
-        }
-      } else {
-        return this.fail(1000, Errors["1000"]);
-      }
-    }
-    return;
+    // let postdata = this.post();
+    // let username = postdata["username"];
+    // let phone = postdata["phone"];
+    // let user = this.model("users");
+    // if (phone != undefined && username != undefined) {
+    //   return;
+    // } else {
+    //   return this.fail(1000, Errors["1000"]);
+    // }
+    //
+    // return;
   }
   /**
    * [Query one's own info]
@@ -76,8 +64,57 @@ module.exports = class Card extends Base {
     let postdata = this.post();
     let username = postdata["username"];
     let phone = postdata["phone"];
-    let userinfo = JSON.parse(decodeUnicode(this.ctx.cookie("userinfo")));
-    return this.success(userinfo);
+    let userinfo = await userInfo(this.post()['username'], this.post()['phone'])
+    return this.success({
+      "dataString": JSON.stringify(userinfo)
+    });
+  }
+  /**
+   * Get one's own MysteryList
+   * @api {get} /user/selectHotestMystery Select Hotest Mystery from whole Myystery List
+   * @apiName Select Hotest Mystery from whole Myystery List
+   * @apiVersion 1.0.1
+   * @apiGroup User
+   * @apiSuccess {JSONString} MysteryList  All the mysteries one has published
+   */
+  async selectHotestMysteryAction() {
+    let postdata = this.post();
+    let userinfo = await userInfo(this.post()['username'], this.post()['phone'])
+    let NowUser = userinfo;
+    // console.log(NowUser);
+    try {
+      let user = this.model("users");
+      let all_users = await user.select();
+      let mysteryList = [];
+      // console.log(all_users);
+      for (let u of all_users) {
+
+        let tmp_data = JSON.parse(u["mystery"]);
+        // console.log("0 ,", tmp_data, tmp_data.length);
+        if (tmp_data.length > 0) {
+          for (let o in tmp_data) {
+            mysteryList.push(tmp_data[o]);
+          }
+        }
+        // console.log("1", mysteryList);
+      }
+      // console.log(mysteryList);
+      mysteryList.sort(function(a, b) {
+        return (a['view'].length - b['view'].length) + (a['comment'].length - b['comment'].length) + (a['favor'] - b['favor']);
+      });
+      if (mysteryList.length < 10) {
+        return this.success({
+          "dataString": JSON.stringify(mysteryList)
+        });
+      } else {
+        return this.success({
+          "dataString": JSON.stringify(mysteryList.slice(0, 10))
+        });
+      }
+    } catch (e) {
+      console.log("Error:", e);
+      return this.fail(1000, Error("Wrong login info:" + JSON.stringify(NowUser)));
+    }
   }
   /**
    * Get one's own MysteryList
@@ -89,10 +126,16 @@ module.exports = class Card extends Base {
    */
   async selectMysteryAction() {
     let postdata = this.post();
-    let userinfo = JSON.parse(decodeUnicode(this.ctx.cookie("userinfo")));
+    let userinfo = await userInfo(this.post()['username'], this.post()['phone'])
     let NowUser = userinfo;
-    let data = JSON.parse(NowUser["mystery"]);
-    return this.success(data);
+    try {
+      let data = JSON.parse(NowUser["mystery"]);
+      return this.success({
+        "dataString": JSON.stringify(data)
+      });
+    } catch (e) {
+      return this.fail(Error("Wrong login info:" + JSON.stringify(NowUser)));
+    }
   }
   /**
    * [Get one's own HistoryList]
@@ -104,10 +147,12 @@ module.exports = class Card extends Base {
    */
   async selectHistoryAction() {
     let postdata = this.post();
-    let userinfo = JSON.parse(decodeUnicode(this.ctx.cookie("userinfo")));
+    let userinfo = await userInfo(this.post()['username'], this.post()['phone'])
     let NowUser = userinfo;
     let data = JSON.parse(NowUser["history"]);
-    return this.success(data);
+    return this.success({
+      "dataString": JSON.stringify(data)
+    });
 
   }
   /**
@@ -120,12 +165,13 @@ module.exports = class Card extends Base {
    */
   async selectMessageAction() {
     let postdata = this.post();
-    let userinfo = JSON.parse(decodeUnicode(this.ctx.cookie("userinfo")));
+    let userinfo = await userInfo(this.post()['username'], this.post()['phone'])
 
     let NowUser = userinfo;
     let data = JSON.parse(NowUser["message"]);
-    return this.success(data);
-
+    return this.success({
+      "dataString": JSON.stringify(data)
+    });
   }
   /**
    * [Get all the information of some user]
@@ -143,13 +189,15 @@ module.exports = class Card extends Base {
     let username = postdata["username"];
     let phone = postdata["phone"];
     let selectUserId = postdata["select_id"];
-    let userinfo = JSON.parse(decodeUnicode(this.ctx.cookie("userinfo")));
+    let userinfo = await userInfo(this.post()['username'], this.post()['phone'])
     let NowUser = userinfo
     let user = this.model("users");
     const data = await user.where({
       id: selectUserId
     }).select();
-    return this.success(data);
+    return this.success({
+      "dataString": JSON.stringify(data)
+    });
   }
 
   /**
@@ -169,11 +217,21 @@ module.exports = class Card extends Base {
   async addMysteryAction() {
     let postdata = this.post();
     let mystery = postdata["mystery"];
-    let userinfo = JSON.parse(decodeUnicode(this.ctx.cookie("userinfo")));
+    let userinfo = await userInfo(this.post()['username'], this.post()['phone'])
+    if (userinfo == undefined) {
+      return this.fail(1006, "Your login info does not exits.");
+    }
     let NowUser = userinfo;
-
+    console.log(NowUser);
+    try {
+      mystery = JSON.parse(mystery);
+      console.log(mystery);
+    } catch (e) {
+      console.log(e);
+    }
     mystery["coins"] = parseInt(mystery["coins"]);
     let coins = parseInt(NowUser["coins"]);
+    console.log("You have ", coins, " coins");
     if (coins >= mystery["coins"]) {
       coins -= mystery["coins"];
     } else {
@@ -198,7 +256,9 @@ module.exports = class Card extends Base {
       mystery: MysteryListString
     });
     if (ans) {
-      return this.success(ans);
+      return this.success({
+        "dataString": JSON.stringify(ans)
+      });
     } else {
       return this.fail(1004, Errors["1004"]);
     }
@@ -220,9 +280,15 @@ module.exports = class Card extends Base {
   async updateMysteryAction() {
     let postdata = this.post();
     let mystery = postdata["mystery"];
-    let userinfo = JSON.parse(decodeUnicode(this.ctx.cookie("userinfo")));
+    let userinfo = await userInfo(this.post()['username'], this.post()['phone'])
 
     let NowUser = userinfo;
+    try {
+      mystery = JSON.parse(mystery);
+      console.log(mystery);
+    } catch (e) {
+      console.log(e);
+    }
 
     let MysteryList = JSON.parse(NowUser["mystery"])
     let NowMystery = MysteryList[mystery["id"] - 1];
@@ -246,7 +312,9 @@ module.exports = class Card extends Base {
       mystery: MysteryListString
     });
     if (ans) {
-      return this.success(ans);
+      return this.success({
+        "dataString": JSON.stringify(ans)
+      });
     } else {
       return this.fail(1004, Errors["1004"]);
     }
@@ -265,7 +333,7 @@ module.exports = class Card extends Base {
     let postdata = this.post();
     let mystery = postdata["mystery"];
     let Cracker;
-    let userinfo = JSON.parse(decodeUnicode(this.ctx.cookie("userinfo")));
+    let userinfo = await userInfo(this.post()['username'], this.post()['phone'])
 
     Cracker = userinfo;
 
@@ -284,7 +352,7 @@ module.exports = class Card extends Base {
     History.push(history);
     let HistoryString = JSON.stringify(History);
     // record decode message for this mystery
-    let userinfo = user.where({
+    userinfo = user.where({
       id: mystery["userid"]
     }).select();
     let MysteryUser = userinfo[0];
@@ -324,6 +392,16 @@ module.exports = class Card extends Base {
       coins: coins,
       history: HistoryString
     });
-    return this.success(res);
+    return this.success({
+      "dataString": JSON.stringify(res)
+    });
   }
 };
+async function userInfo(username, phone) {
+  let user = think.model("users");
+  let userinfo = await user.where({
+    username: username,
+    phone: phone
+  }).select();
+  return userinfo[0];
+}

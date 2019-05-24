@@ -1,6 +1,9 @@
 // default config
+
 module.exports = {
   workers: 1,
+  //支持https,仅用于storygame.top
+  // createServer: app,
   Errors: {
     1000: "Wrong post data.",
     1001: "The phone you want to registry has existed.",

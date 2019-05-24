@@ -27,12 +27,13 @@
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
-    "ava": "^0.18.0",
+    "ava": "^0.18.2",
     "chai": "^4.2.0",
     "eslint": "^4.2.0",
     "eslint-config-think": "^1.0.0",
+    "fs": "0.0.1-security",
     "mocha": "^6.1.4",
-    "nyc": "^7.1.0",
+    "nyc": "^14.0.0",
     "think-watcher": "^3.0.3"
   },
   "repository": "",
@@ -54,10 +55,14 @@
     "isMultiModule": false
   },
   "babel": {
-    "presets": ["@babel/preset-env"],
+    "presets": [
+      "@babel/preset-env"
+    ],
     "env": {
       "test": {
-        "plugins": ["istanbul"]
+        "plugins": [
+          "istanbul"
+        ]
       }
     }
   },

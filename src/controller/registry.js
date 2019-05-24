@@ -1,3 +1,4 @@
+let Errors = think.config("Errors");
 module.exports = class extends think.Controller {
   __before() {
     var _this = this;
@@ -35,6 +36,9 @@ module.exports = class extends think.Controller {
     if (ans) {
       let user = this.model("users");
       // repeat the verification
+      if (phone == undefined) {
+        return this.fail(1000, Errors["1000"]);
+      }
       let repeat_user = await user.where({
         phone: phone
       }).select();
@@ -56,7 +60,9 @@ module.exports = class extends think.Controller {
         "history": "[]",
         "message": "[]"
       });
-      return this.success(add_data);
+      return this.success({
+        "dataSting": JSON.stringify(add_data)
+      });
     }
   };
 };
